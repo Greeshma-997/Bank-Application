@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>State Bank of India</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('image.jpg') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding-top: 40px;
+    }
+
+    .container {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 520px;
+      backdrop-filter: blur(4px);
+    }
+
+    h1 {
+      text-align: center;
+      color: #003366;
+    }
+
+    label {
+      margin-top: 20px;
+      display: block;
+      font-weight: bold;
+      color: #333;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #003366;
+      color: white;
+      border: none;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #002244;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .note {
+      font-size: 14px;
+      color: #888;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #222;
+    }
+
+    .statement {
+      margin-top: 15px;
+      background: #f0f0f0;
+      padding: 10px;
+      border-radius: 8px;
+      max-height: 150px;
+      overflow-y: auto;
+      font-size: 14px;
+    }
+
+    .statement-entry {
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>STATE BANK OF INDIA</h1>
+
+  <!-- Login Form -->
+  <div id="login-section">
+    <label for="name">Customer Name:</label>
+    <input type="text" id="name" placeholder="Enter your name" required>
+
+    <label for="password">5-Digit Password:</label>
+    <input type="password" id="password" maxlength="5" placeholder="Enter password" required>
+    <div class="note">Password must be exactly 5 digits.</div>
+
+    <button onclick="validateLogin()">Login</button>
+    <div id="login-error" class="note" style="color: red;"></div>
+  </div>
+
+  <!-- Continue Prompt -->
+  <div id="continue-section" class="hidden">
+    <label>Do you want to continue?</label>
+    <select id="continueChoice">
+      <option value="">--Select--</option>
+      <option value="N">No</option>
+      <option value="Y">Yes</option>
+    </select>
+    <button onclick="handleContinue()">Submit</button>
+  </div>
+
+  <!-- Banking Options -->
+  <div id="banking-section" class="hidden">
+    <label for="option">Select Operation:</label>
+    <select id="option" onchange="showFields()">
+      <option value="">--Choose--</option>
+      <option value="1">Bank Balance</option>
+      <option value="2">Withdraw</option>
+      <option value="3">Deposit</option>
+      <option value="4">Update Mobile Number</option>
+      <option value="5">Mini Statement</option>
+    </select>
+
+    <!-- Withdraw/Deposit Fields -->
+    <div id="amount-section" class="hidden">
+      <label for="amount">Enter Amount:</label>
+      <input type="number" id="amount" min="0">
+    </div>
+
+    <!-- Mobile Update -->
+    <div id="mobile-section" class="hidden">
+      <label for="oldMobile">Current Mobile No:</label>
+      <input type="text" id="oldMobile">
+      <label for="newMobile">New Mobile No:</label>
+      <input type="text" id="newMobile">
+    </div>
+
+    <button onclick="processTransaction()">Submit Operation</button>
+    <div id="result" class="result"></div>
+
+    <!-- Mini Statement -->
+    <div id="mini-statement" class="statement hidden">
+      <strong>Mini Statement:</strong>
+      <div id="statement-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let balance = 5000;
+  let statement = [];
+
+  function validateLogin() {
+    const password = document.getElementById('password').value;
+    const error = document.getElementById('login-error');
+
+    if (password.length === 5) {
+      document.getElementById('login-section').classList.add('hidden');
+      document.getElementById('continue-section').classList.remove('hidden');
+    } else {
+      error.innerText = "Invalid password. Access denied.";
+    }
+  }
+
+  function handleContinue() {
+    const choice = document.getElementById('continueChoice').value;
+    if (choice === "N") {
+      alert("Thanks for visiting!");
+      location.reload();
+    } else if (choice === "Y") {
+      document.getElementById('continue-section').classList.add('hidden');
+      document.getElementById('banking-section').classList.remove('hidden');
+    }
+  }
+
+  function showFields() {
+    const option = document.getElementById('option').value;
+    document.getElementById('amount-section').classList.add('hidden');
+    document.getElementById('mobile-section').classList.add('hidden');
+    document.getElementById('mini-statement').classList.add('hidden');
+    document.getElementById('result').innerText = "";
+
+    if (option === "2" || option === "3") {
+      document.getElementById('amount-section').classList.remove('hidden');
+    } else if (option === "4") {
+      document.getElementById('mobile-section').classList.remove('hidden');
+    }
+  }
+
+  function processTransaction() {
+    const option = document.getElementById('option').value;
+    const result = document.getElementById('result');
+    const statementList = document.getElementById('statement-list');
+    document.getElementById('mini-statement').classList.add('hidden');
+    result.innerText = "";
+
+    if (option === "1") {
+      result.innerText = `Your balance is ₹${balance}`;
+    } else if (option === "2") {
+      const amt = parseInt(document.getElementById('amount').value);
+      if (amt > balance) {
+        result.innerText = "Insufficient balance.";
+      } else {
+        balance -= amt;
+        statement.push(`Withdrawn ₹${amt} | New Balance: ₹${balance}`);
+        result.innerText = `₹${amt} withdrawn. New balance: ₹${balance}`;
+      }
+    } else if (option === "3") {
+      const amt = parseInt(document.getElementById('amount').value);
+      balance += amt;
+      statement.push(`Deposited ₹${amt} | New Balance: ₹${balance}`);
+      result.innerText = `₹${amt} deposited. New balance: ₹${balance}`;
+    } else if (option === "4") {
+      const oldNo = document.getElementById('oldMobile').value;
+      const newNo = document.getElementById('newMobile').value;
+      if (oldNo === newNo) {
+        result.innerText = "Unable to process: numbers are the same.";
+      } else {
+        result.innerText = "Your mobile number is updated.";
+      }
+    } else if (option === "5") {
+      document.getElementById('mini-statement').classList.remove('hidden');
+      if (statement.length === 0) {
+        statementList.innerHTML = "<div class='statement-entry'>No transactions yet.</div>";
+      } else {
+        statementList.innerHTML = "";
+        statement.slice(-5).reverse().forEach(entry => {
+          const div = document.createElement('div');
+          div.className = 'statement-entry';
+          div.innerText = entry;
+          statementList.appendChild(div);
+        });
+      }
+    } else {
+      result.innerText = "Please select a valid option.";
+    }
+  }
+</script>
+
+</body>
+</html>
